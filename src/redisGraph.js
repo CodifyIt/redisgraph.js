@@ -107,7 +107,6 @@ class Edge {
         assert.equal(srcNode instanceof Node, true);
         assert.notEqual(destNode, null);
         assert.equal(destNode instanceof Node, true);
-
         this.srcNode = srcNode;
         this.relation = relation;
         this.destNode = destNode;
@@ -123,25 +122,26 @@ class Edge {
     toString () {
 
 		// The source node (sourceNodeAlias)
-        let edgeString = '(' + this.srcNode.getAlias() + ')';
+				let edgeString = '(' + this.srcNode.getAlias() + ')';
 
 		// The relation (sourceNodeAlias)-[:relation]
-        edgeString += '-[';
-
+				edgeString += '-[';
+				
         if ( this.relation !== null) {
-            edgeString += ': ' + this.relation;
-        }
+            edgeString += ':' + this.relation;
+				}
 
-        if ( this.properties != null || this.properties != {}) {
+				
+        if ( this.properties && this.properties !== {}) {
             // Formating properties to add to the string
-		  let properties = JSON.stringify(this.properties);
-  
-		  // Removing the double quotes around the keys
-          properties = properties.replace(/\"(\w*)\":/g, "$1:");
-          
-          edgeString = ' ' + properties;
-        }
-
+						let properties = JSON.stringify(this.properties);
+				
+						// Removing the double quotes around the keys
+						properties = properties.replace(/\"(\w*)\":/g, "$1:");
+						
+						edgeString = ' ' + properties;
+				}
+				
         edgeString += ']->';
 
 		// The destination node (sourceNodeAlias)-[:relation]->(destinationNodeAlias)
@@ -219,6 +219,15 @@ class RedisGraph {
 	}
 
 	/**
+	 * To clear the dictionary of nodes
+	 * and the array of edges
+	 */
+	clear() {
+		this.nodes = {};
+		this.edges = [];
+	}
+
+	/**
 	 * To commit the graph
 	 * Create the graph with the added nodes and the edges
 	 */
@@ -239,7 +248,7 @@ class RedisGraph {
 		if (query[query.length - 1] === ',') {
 			query = query.slice(0, query.length-1);
 		}
-
+		this.clear();
 		return this.query(query);
 	}
 

@@ -184,4 +184,37 @@ describe('RedisGraphAPI Test', () =>{
 			);
 		});
 	});
+
+	it("test Connect Node Objects", () => {
+		// Create both source and destination nodes
+		const node1 = new RedisGraphNode(null, "a", "person",properties={
+			name:'roi',
+			age:32}
+		);
+		// Adding node1 to the graph
+		api.addNode(node1);
+		const node2 = new RedisGraphNode(null, "b", "person",properties={
+			name:'amit',
+			age:30}
+		);
+		// Adding node2 to the graph
+		api.addNode(node2);
+
+		const edge = new RedisGraphEdge(node1, "knows", node2);
+		// Adding edge to the graph
+		api.addEdge(edge);
+		// Connect source and destination nodes.
+
+		return api.commit()
+			.then(matchResult => {
+				assert.ok(!matchResult.hasNext());
+				assert.equal(1, matchResult.getStatistics().relationshipsCreated());
+				assert.equal(0, matchResult.getStatistics().relationshipsDeleted());
+				assert.ok(
+					matchResult
+						.getStatistics()
+						.getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)
+				);
+			});
+	});
 });
