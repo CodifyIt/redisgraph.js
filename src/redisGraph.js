@@ -9,7 +9,7 @@ const redis = require("redis"),
  *  @param length Length of the random string
  */
 randomString = function(length=20){
-	return crypto.randomBytes(length/2).toString('hex');
+	return "test" + crypto.randomBytes(length/2).toString('hex');
 }
 
 /**
@@ -186,7 +186,7 @@ class RedisGraph {
 		 * If alias is null, then alloting it a random alias
 		 */
 		if (node.getAlias() === null) {
-			node.setAlias(random_string());
+			node.setAlias(randomString());
 		}
 		this.nodes[node.getAlias()] = node;
 	}
@@ -226,12 +226,12 @@ class RedisGraph {
 		let query = 'CREATE ';
 
 		// Add nodes to the query
-		for (let node in self.nodes) {
-			query += self.nodes[node].toString() + ',';
+		for (let node in this.nodes) {
+			query += this.nodes[node].toString() + ',';
 		}
 
 		// Add edges to the query
-		for (let edge of edges ) {
+		for (let edge of this.edges ) {
 			query += edge.toString() + ',';
 		}
 
@@ -240,7 +240,7 @@ class RedisGraph {
 			query = query.slice(0, query.length-1);
 		}
 
-		return self.query(query);
+		return this.query(query);
 	}
 
 	/**
@@ -254,9 +254,8 @@ class RedisGraph {
 		});
 	}
 }
-
-module.exports = [
+module.exports = { 
 	RedisGraph,
 	Node,
 	Edge
-]
+};

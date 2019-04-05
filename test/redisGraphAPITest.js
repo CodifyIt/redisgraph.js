@@ -1,9 +1,12 @@
 const assert = require("assert"),
 	redis = require("redis"),
 	Label = require("../src/label"),
-	RedisGraph = require("../src/redisGraph");
+	RedisGraph = require("../src/redisGraph").RedisGraph,
+	RedisGraphNode = require("../src/redisGraph").Node,
+	RedisGraphEdge = require("../src/redisGraph").Edge;
 
 describe('RedisGraphAPI Test', () =>{
+	console.log(RedisGraph);
 	const api = new RedisGraph("social");
 	
 	beforeEach( () => {
@@ -30,7 +33,7 @@ describe('RedisGraphAPI Test', () =>{
 			);
 			assert.equal(2, result.getStatistics().propertiesSet());
 			assert.ok( result.getStatistics().queryExecutionTime()); // not 0
-			assert.ok(result.getStatistics().getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)); // exsits   
+			assert.ok(result.getStatistics().getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)); // exits   
 		});
 	});
 
@@ -120,6 +123,36 @@ describe('RedisGraphAPI Test', () =>{
 			assert.equal( true, record.containsKey("a.name"));
 			assert.equal( 2, record.size());
 
+		});
+	});
+
+	// Test cases with Node and Edge class
+	it("test Create Node as Object", () => {
+		// Create a node
+		const node = new RedisGraphNode(null,null,null, properties={
+			name: 'roi',
+			age: 32
+		})
+
+		// Adding node to graph
+		api.addNode(node);
+
+		// Commiting the graph
+		return api.commit().then(result => {
+			assert.ok(!result.hasNext());
+			assert.equal(1, result.getStatistics().nodesCreated());
+			assert.ifError(
+				result.getStatistics().getStringValue(Label.NODES_DELETED)
+			);
+			assert.ifError(
+				result.getStatistics().getStringValue(Label.RELATIONSHIPS_CREATED)
+			);
+			assert.ifError(
+				result.getStatistics().getStringValue(Label.RELATIONSHIPS_DELETED)
+			);
+			assert.equal(2, result.getStatistics().propertiesSet());
+			assert.ok( result.getStatistics().queryExecutionTime()); // not 0
+			assert.ok(result.getStatistics().getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)); // exits   
 		});
 	});
 });
