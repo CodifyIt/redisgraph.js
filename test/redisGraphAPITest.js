@@ -126,7 +126,8 @@ describe('RedisGraphAPI Test', () =>{
 		});
 	});
 
-	// Test cases with Node and Edge class
+	//------------- Test cases with Node and Edge class -------------
+
 	it("test Create Node as Object", () => {
 		// Create a node
 		const node = new RedisGraphNode(null,null,null, properties={
@@ -153,6 +154,34 @@ describe('RedisGraphAPI Test', () =>{
 			assert.equal(2, result.getStatistics().propertiesSet());
 			assert.ok( result.getStatistics().queryExecutionTime()); // not 0
 			assert.ok(result.getStatistics().getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)); // exits   
+		});
+	});
+
+	it("test Create Labeled Node as Object", () => {
+		// Create a node with a label
+		const node = new RedisGraphNode(null,null,"human", properties={
+			name: 'danny',
+			age: 12
+		})
+
+		// Adding node to graph
+		api.addNode(node);
+
+		return api.commit().then(result => {
+			assert.ok(!result.hasNext());
+			assert.equal(
+				"1",
+				result.getStatistics().getStringValue(Label.NODES_CREATED)
+			);
+			assert.equal(
+				"2",
+				result.getStatistics().getStringValue(Label.PROPERTIES_SET)
+			);
+			assert.ok(
+				result
+					.getStatistics()
+					.getStringValue(Label.QUERY_INTERNAL_EXECUTION_TIME)
+			);
 		});
 	});
 });
